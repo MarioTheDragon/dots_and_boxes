@@ -15,7 +15,7 @@ enum StickState {
 }
 
 #[derive(Bundle, Clone)]
-struct Stick {
+pub struct Stick {
     state: StickState,
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,

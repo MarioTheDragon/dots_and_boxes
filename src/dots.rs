@@ -6,7 +6,7 @@ use bevy::prelude::{
 };
 
 #[derive(Bundle, Clone)]
-struct Corner {
+pub struct Dot {
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,
     transform: Transform,
@@ -20,7 +20,7 @@ pub fn spawn_corners(
     let color = materials.add(Color::from(GRAY_100));
     let shape = meshes.add(Rectangle::new(10.0, 10.0));
 
-    let mut corner = Corner {
+    let mut corner = Dot {
         mesh: Mesh2d(shape),
         material: MeshMaterial2d(color),
         transform: Transform::from_xyz(0.0, 0.0, 0.0),

@@ -1,7 +1,8 @@
-mod corners;
+mod dots;
 mod sticks;
+mod arena;
 
-use crate::corners::spawn_corners;
+use crate::dots::spawn_corners;
 use crate::sticks::spawn_edges;
 use bevy::prelude::*;
 
