@@ -3,20 +3,15 @@ use bevy::color::Color;
 use bevy::color::palettes::tailwind::{CYAN_300, RED_300};
 use bevy::math::Quat;
 use bevy::prelude::{
-    Bundle, Click, ColorMaterial, Commands, Component, Mesh, Mesh2d, MeshMaterial2d, Out, Over,
-    Pointer, Query, Rectangle, ResMut, Transform, Trigger,
+    Bundle, Click, ColorMaterial, Commands, Mesh, Mesh2d, MeshMaterial2d, Out,
+    Over, Pointer, Query, Rectangle, ResMut, Transform, Trigger,
 };
 
-#[derive(Component, Clone, Copy)]
-enum StickState {
-    Unselected,
-    PlayerA,
-    // PlayerB,
-}
+use crate::common::FieldOwner;
 
 #[derive(Bundle, Clone)]
 pub struct Stick {
-    state: StickState,
+    owner: FieldOwner,
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,
     transform: Transform,
@@ -28,7 +23,11 @@ struct StickMaterialSet {
     selected: Handle<ColorMaterial>,
 }
 
-fn spawn_edge(commands: &mut Commands, stick: Stick, stick_material_set: &StickMaterialSet) {
+fn spawn_edge(
+    commands: &mut Commands,
+    stick: Stick,
+    stick_material_set: &StickMaterialSet,
+) {
     commands
         .spawn(stick.clone())
         .observe(update_material_on::<Pointer<Over>>(
@@ -55,7 +54,7 @@ pub fn spawn_edges(
     };
 
     let mut stick = Stick {
-        state: StickState::Unselected,
+        owner: FieldOwner::Unselected,
         mesh: Mesh2d(shape),
         material: MeshMaterial2d(stick_material_set.default.clone()),
         transform: Transform::from_xyz(0.0, 50.0, 0.0),
@@ -71,7 +70,8 @@ pub fn spawn_edges(
     }
 
     stick.transform = Transform::from_xyz(50.0, 0.0, 0.0);
-    stick.transform.rotation = Quat::from_rotation_z(std::f32::consts::PI / 2.0);
+    stick.transform.rotation =
+        Quat::from_rotation_z(std::f32::consts::PI / 2.0);
     for _ in 0..9 {
         for _ in 0..5 {
             spawn_edge(&mut commands, stick.clone(), &stick_material_set);
@@ -84,14 +84,14 @@ pub fn spawn_edges(
 
 fn on_click(
     new_material: Handle<ColorMaterial>,
-) -> impl Fn(Trigger<Pointer<Click>>, Query<&mut MeshMaterial2d<ColorMaterial>>, Query<&mut StickState>)
-{
-    move |trigger, mut material_query, mut stick_state_query| {
-        if let Ok(mut material) = material_query.get_mut(trigger.target()) {
-            material.0 = new_material.clone();
-        }
-        if let Ok(mut stick_state) = stick_state_query.get_mut(trigger.target()) {
-            *stick_state = StickState::PlayerA;
+) -> impl Fn(
+    Trigger<Pointer<Click>>,
+    Query<(&mut FieldOwner, &mut MeshMaterial2d<ColorMaterial>)>,
+) {
+    move |trigger, mut sticks| {
+        if let Ok(mut stick) = sticks.get_mut(trigger.target()) {
+            stick.1.0 = new_material.clone();
+            *stick.0 = FieldOwner::PlayerA;
         }
     }
 }
@@ -99,16 +99,14 @@ fn on_click(
 /// Returns an observer that updates the entity's material to the one specified.
 fn update_material_on<E>(
     new_material: Handle<ColorMaterial>,
-) -> impl Fn(Trigger<E>, Query<&mut MeshMaterial2d<ColorMaterial>>, Query<&mut StickState>) {
-    move |trigger, mut material_query, mut stick_state_query| {
-        if let Ok(stick_state) = stick_state_query.get_mut(trigger.target()) {
-            if !matches!(*stick_state, StickState::Unselected) {
+) -> impl Fn(Trigger<E>, Query<(&mut FieldOwner, &mut MeshMaterial2d<ColorMaterial>)>)
+{
+    move |trigger, mut sticks| {
+        if let Ok(mut stick) = sticks.get_mut(trigger.target()) {
+            if !matches!(*stick.0, FieldOwner::Unselected) {
                 return;
             }
-        }
-
-        if let Ok(mut material) = material_query.get_mut(trigger.target()) {
-            material.0 = new_material.clone();
+            stick.1.0 = new_material.clone();
         }
     }
 }

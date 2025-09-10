@@ -2,7 +2,8 @@ use bevy::asset::Assets;
 use bevy::color::Color;
 use bevy::color::palettes::tailwind::GRAY_100;
 use bevy::prelude::{
-    Bundle, ColorMaterial, Commands, Mesh, Mesh2d, MeshMaterial2d, Rectangle, ResMut, Transform,
+    Bundle, ColorMaterial, Commands, Mesh, Mesh2d, MeshMaterial2d, Rectangle,
+    ResMut, Transform,
 };
 
 #[derive(Bundle, Clone)]
