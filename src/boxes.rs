@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use crate::{TestEvent, common::FieldOwner};
+use crate::{common::{FieldOwner, GridPosition}, TestEvent};
 
 #[derive(Component, Clone, Copy)]
 pub struct BoxMarker;
@@ -11,6 +11,7 @@ pub struct BoxMarker;
 #[derive(Bundle, Clone)]
 pub struct Box {
     marker: BoxMarker,
+    grid_position: GridPosition,
     state: FieldOwner,
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,
@@ -62,6 +63,7 @@ pub fn spawn_boxes(
 
     let mut r#box = Box {
         state: FieldOwner::Unselected,
+        grid_position: GridPosition::new(1, 1),
         mesh: Mesh2d(shape),
         material: MeshMaterial2d(box_material_set.unselected.clone()),
         transform: Transform::from_xyz(50.0, 50.0, 0.0),
@@ -72,7 +74,10 @@ pub fn spawn_boxes(
         for _ in 0..4 {
             spawn_box(&mut commands, r#box.clone(), &box_material_set);
             r#box.transform.translation.y += 100.0;
+            r#box.grid_position.y += 2;
         }
+        r#box.grid_position.y = 1;
+        r#box.grid_position.x += 2;
         r#box.transform.translation.y = 50.0;
         r#box.transform.translation.x += 100.0;
     }
