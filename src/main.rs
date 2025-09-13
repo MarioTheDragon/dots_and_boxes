@@ -8,7 +8,7 @@ mod sticks;
 use crate::boxes::{BoxMarker, spawn_boxes};
 use crate::common::GridPosition;
 use crate::dots::spawn_corners;
-use crate::sticks::{StickOrientation, spawn_edges};
+use crate::sticks::{StickOrientation, StickSelectEvent, spawn_edges};
 use bevy::prelude::*;
 
 fn move_camera(mut camera: Single<&mut Transform, With<Camera2d>>) {
@@ -21,12 +21,6 @@ fn setup(mut commands: Commands) {
 
 #[derive(Event)]
 pub struct TestEvent(pub i32);
-
-#[derive(Event, Debug)]
-pub struct StickSelectEvent {
-    position: GridPosition,
-    orientation: StickOrientation,
-}
 
 fn main() {
     App::new()

@@ -2,19 +2,25 @@ use bevy::asset::{Assets, Handle};
 use bevy::color::Color;
 use bevy::color::palettes::tailwind::{CYAN_300, RED_300};
 use bevy::ecs::component::Component;
+use bevy::ecs::event::Event;
 use bevy::math::Quat;
 use bevy::prelude::{
     Bundle, Click, ColorMaterial, Commands, Mesh, Mesh2d, MeshMaterial2d, Out,
     Over, Pointer, Query, Rectangle, ResMut, Transform, Trigger,
 };
 
-use crate::StickSelectEvent;
 use crate::common::{FieldOwner, GridPosition};
 
 #[derive(Component, Clone, Copy, Debug)]
 pub enum StickOrientation {
     Vertical,
     Horizontal,
+}
+
+#[derive(Event, Debug)]
+pub struct StickSelectEvent {
+    pub position: GridPosition,
+    pub orientation: StickOrientation,
 }
 
 #[derive(Bundle, Clone)]

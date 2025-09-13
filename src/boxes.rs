@@ -3,13 +3,20 @@ use bevy::{
     prelude::*,
 };
 
-use crate::{common::{FieldOwner, GridPosition}, TestEvent};
+use crate::{
+    TestEvent,
+    common::{FieldOwner, GridPosition},
+};
 
 #[derive(Component, Clone, Copy)]
 pub struct BoxMarker;
 
+#[derive(Component, Clone, Copy)]
+struct NumSelectedNeighbors(usize);
+
 #[derive(Bundle, Clone)]
 pub struct Box {
+    num_selected_neighbors: NumSelectedNeighbors,
     marker: BoxMarker,
     grid_position: GridPosition,
     state: FieldOwner,
@@ -39,13 +46,21 @@ fn update_material(
     box_material_set: BoxMaterialSet,
 ) -> impl Fn(
     Trigger<TestEvent>,
-    Query<(&mut FieldOwner, &mut MeshMaterial2d<ColorMaterial>)>,
+    Query<(
+        &mut FieldOwner,
+        &mut MeshMaterial2d<ColorMaterial>,
+        &mut NumSelectedNeighbors,
+    )>,
 ) {
     move |trigger, mut query| {
-        let (mut owner, mut material) =
+        let (mut owner, mut material, mut num_selected_neighbors) =
             query.get_mut(trigger.target()).unwrap();
-        *owner = FieldOwner::PlayerA;
-        material.0 = box_material_set.player_a.clone();
+        num_selected_neighbors.0 += 1;
+
+        if num_selected_neighbors.0 == 4 {
+            *owner = FieldOwner::PlayerA;
+            material.0 = box_material_set.player_a.clone();
+        }
     }
 }
 
@@ -68,6 +83,7 @@ pub fn spawn_boxes(
         material: MeshMaterial2d(box_material_set.unselected.clone()),
         transform: Transform::from_xyz(50.0, 50.0, 0.0),
         marker: BoxMarker,
+        num_selected_neighbors: NumSelectedNeighbors(0),
     };
 
     for _ in 0..9 {
