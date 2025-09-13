@@ -5,8 +5,12 @@ use bevy::{
 
 use crate::{TestEvent, common::FieldOwner};
 
+#[derive(Component, Clone, Copy)]
+pub struct BoxMarker;
+
 #[derive(Bundle, Clone)]
 pub struct Box {
+    marker: BoxMarker,
     state: FieldOwner,
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,
@@ -37,9 +41,10 @@ fn update_material(
     Query<(&mut FieldOwner, &mut MeshMaterial2d<ColorMaterial>)>,
 ) {
     move |trigger, mut query| {
-        let (mut owner, mut mesh) = query.get_mut(trigger.target()).unwrap();
+        let (mut owner, mut material) =
+            query.get_mut(trigger.target()).unwrap();
         *owner = FieldOwner::PlayerA;
-        mesh.0 = box_material_set.player_a.clone();
+        material.0 = box_material_set.player_a.clone();
     }
 }
 
@@ -55,19 +60,20 @@ pub fn spawn_boxes(
         player_b: materials.add(Color::from(RED_200)),
     };
 
-    let mut new_box = Box {
+    let mut r#box = Box {
         state: FieldOwner::Unselected,
         mesh: Mesh2d(shape),
         material: MeshMaterial2d(box_material_set.unselected.clone()),
         transform: Transform::from_xyz(50.0, 50.0, 0.0),
+        marker: BoxMarker,
     };
 
     for _ in 0..9 {
         for _ in 0..4 {
-            spawn_box(&mut commands, new_box.clone(), &box_material_set);
-            new_box.transform.translation.y += 100.0;
+            spawn_box(&mut commands, r#box.clone(), &box_material_set);
+            r#box.transform.translation.y += 100.0;
         }
-        new_box.transform.translation.y = 50.0;
-        new_box.transform.translation.x += 100.0;
+        r#box.transform.translation.y = 50.0;
+        r#box.transform.translation.x += 100.0;
     }
 }

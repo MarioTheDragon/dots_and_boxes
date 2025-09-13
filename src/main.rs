@@ -3,8 +3,7 @@ mod common;
 mod dots;
 mod sticks;
 
-use crate::boxes::spawn_boxes;
-use crate::common::FieldOwner;
+use crate::boxes::{BoxMarker, spawn_boxes};
 use crate::dots::spawn_corners;
 use crate::sticks::spawn_edges;
 use bevy::prelude::*;
@@ -18,28 +17,31 @@ fn setup(mut commands: Commands) {
 }
 
 #[derive(Event)]
-#[event(auto_propagate)]
 pub struct TestEvent(pub i32);
+
+#[derive(Event)]
+pub struct BoxEvent(pub i32);
 
 fn main() {
     App::new()
         .add_event::<TestEvent>()
         .add_plugins((DefaultPlugins, MeshPickingPlugin))
         .add_observer(
-            |_: Trigger<TestEvent>,
-             mut sticks: Query<Entity, With<FieldOwner>>,
+            |_: Trigger<BoxEvent>,
+             mut boxes: Query<Entity, With<BoxMarker>>,
              mut commands: Commands| {
-                for stick in &mut sticks {
-                    commands.trigger_targets(TestEvent(5), stick);
+                for r#box in &mut boxes {
+                    commands.trigger_targets(TestEvent(5), r#box);
                 }
             },
         )
         .add_systems(Startup, (setup, move_camera).chain())
-        .add_systems(Startup, spawn_boxes)
+        .add_systems(Startup, (spawn_boxes, demo_trigger).chain())
         .add_systems(Startup, spawn_corners)
         .add_systems(Startup, spawn_edges)
-        // .add_systems(Update, |mut commands: Commands| {
-        //     commands.trigger(TestEvent(6));
-        // })
         .run();
+}
+
+fn demo_trigger(mut commands: Commands) {
+    commands.trigger(BoxEvent(5));
 }
