@@ -8,7 +8,7 @@ mod score;
 
 use crate::boxes::{BoxMarker, spawn_boxes};
 use crate::score::{spawn_score, update_score_display};
-use crate::common::GridPosition;
+use crate::common::{spawn_current_player, GridPosition};
 use crate::dots::spawn_corners;
 use crate::sticks::{StickOrientation, StickSelectEvent, spawn_edges};
 use bevy::prelude::*;
@@ -30,6 +30,7 @@ fn main() {
         .add_plugins((DefaultPlugins, MeshPickingPlugin))
         .add_observer(stick_selection_observer)
         .add_systems(Startup, spawn_score)
+        .add_systems(Startup, spawn_current_player)
         .add_systems(Startup, (setup, move_camera).chain())
         .add_systems(Startup, spawn_boxes)
         .add_systems(Startup, spawn_corners)

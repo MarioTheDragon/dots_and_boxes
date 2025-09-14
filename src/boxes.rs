@@ -4,7 +4,7 @@ use bevy::{
 };
 
 use crate::{
-    common::{FieldOwner, GridPosition}, score::Score, TestEvent
+    common::{GridPosition, CurrentPlayer}, score::Score, TestEvent
 };
 
 #[derive(Component, Clone, Copy)]
@@ -18,7 +18,6 @@ pub struct Box {
     num_selected_neighbors: NumSelectedNeighbors,
     marker: BoxMarker,
     grid_position: GridPosition,
-    state: FieldOwner,
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,
     transform: Transform,
@@ -29,6 +28,15 @@ struct BoxMaterialSet {
     unselected: Handle<ColorMaterial>,
     player_a: Handle<ColorMaterial>,
     player_b: Handle<ColorMaterial>,
+}
+
+impl BoxMaterialSet {
+    fn get(&self, player: CurrentPlayer) -> Handle<ColorMaterial> {
+        match player {
+            CurrentPlayer::PlayerA => self.player_a.clone(),
+            CurrentPlayer::PlayerB => self.player_b.clone(),
+        }
+    }
 }
 
 fn spawn_box(
@@ -46,21 +54,22 @@ fn update_material(
 ) -> impl Fn(
     Trigger<TestEvent>,
     Query<(
-        &mut FieldOwner,
         &mut MeshMaterial2d<ColorMaterial>,
         &mut NumSelectedNeighbors,
     )>,
     Single<&mut Score>,
+    Single<&mut CurrentPlayer>,
 ) {
-    move |trigger, mut box_query, mut score| {
-        let (mut owner, mut material, mut num_selected_neighbors) =
+    move |trigger, mut box_query, mut score, mut current_player| {
+        let (mut material, mut num_selected_neighbors) =
             box_query.get_mut(trigger.target()).unwrap();
         num_selected_neighbors.0 += 1;
 
         if num_selected_neighbors.0 == 4 {
-            *owner = FieldOwner::PlayerA;
-            material.0 = box_material_set.player_a.clone();
-            score.update(FieldOwner::PlayerA);
+            material.0 = box_material_set.get(**current_player);
+            score.update(**current_player);
+        } else {
+            current_player.switch();
         }
     }
 }
@@ -78,7 +87,6 @@ pub fn spawn_boxes(
     };
 
     let mut r#box = Box {
-        state: FieldOwner::Unselected,
         grid_position: GridPosition::new(1, 1),
         mesh: Mesh2d(shape),
         material: MeshMaterial2d(box_material_set.unselected.clone()),

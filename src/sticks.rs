@@ -9,7 +9,7 @@ use bevy::prelude::{
     Over, Pointer, Query, Rectangle, ResMut, Transform, Trigger,
 };
 
-use crate::common::{FieldOwner, GridPosition};
+use crate::common::GridPosition;
 
 #[derive(Component, Clone, Copy, Debug)]
 pub enum StickOrientation {
@@ -23,11 +23,14 @@ pub struct StickSelectEvent {
     pub orientation: StickOrientation,
 }
 
+#[derive(Component, Clone, Copy)]
+pub struct StickSelected(bool);
+
 #[derive(Bundle, Clone)]
 pub struct Stick {
+    selected: StickSelected,
     grid_position: GridPosition,
     orientation: StickOrientation,
-    owner: FieldOwner,
     mesh: Mesh2d,
     material: MeshMaterial2d<ColorMaterial>,
     transform: Transform,
@@ -71,11 +74,11 @@ pub fn spawn_edges(
 
     let mut stick = Stick {
         grid_position: GridPosition::new(0, 1),
-        owner: FieldOwner::Unselected,
         mesh: Mesh2d(shape),
         material: MeshMaterial2d(stick_material_set.default.clone()),
         transform: Transform::from_xyz(0.0, 50.0, 0.0),
         orientation: StickOrientation::Vertical,
+        selected: StickSelected(false),
     };
 
     for _ in 0..10 {
@@ -114,37 +117,37 @@ fn on_click(
     Trigger<Pointer<Click>>,
     Commands,
     Query<(
-        &mut FieldOwner,
         &mut MeshMaterial2d<ColorMaterial>,
+        &mut StickSelected,
         &GridPosition,
         &StickOrientation,
     )>,
 ) {
     move |trigger, mut commands, mut sticks| {
-        if let Ok((mut owner, mut material, position, orientation)) =
+        if let Ok((mut material, mut selected, position, orientation)) =
             sticks.get_mut(trigger.target())
         {
+            selected.0 = true;
+            material.0 = new_material.clone();
             commands.trigger(StickSelectEvent {
                 position: *position,
                 orientation: *orientation,
             });
-            material.0 = new_material.clone();
-            *owner = FieldOwner::PlayerA;
         }
     }
 }
 
-/// Returns an observer that updates the entity's material to the one specified.
 fn update_material_on<E>(
     new_material: Handle<ColorMaterial>,
-) -> impl Fn(Trigger<E>, Query<(&mut FieldOwner, &mut MeshMaterial2d<ColorMaterial>)>)
+) -> impl Fn(Trigger<E>, Query<(&StickSelected, &mut MeshMaterial2d<ColorMaterial>)>)
 {
     move |trigger, mut sticks| {
-        if let Ok(mut stick) = sticks.get_mut(trigger.target()) {
-            if !matches!(*stick.0, FieldOwner::Unselected) {
+        if let Ok(stick) = sticks.get_mut(trigger.target()) {
+            let (already_selected, mut material) = stick;
+            if already_selected.0 {
                 return;
             }
-            stick.1.0 = new_material.clone();
+            material.0 = new_material.clone();
         }
     }
 }

@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use crate::common::FieldOwner;
+use crate::common::{CurrentPlayer};
 
 #[derive(Component, Clone, Copy)]
 pub struct Score {
@@ -21,11 +21,10 @@ impl Score {
         }
     }
 
-    pub fn update(&mut self, field_owner: FieldOwner) {
-        match field_owner {
-            FieldOwner::Unselected => {}
-            FieldOwner::PlayerA => self.player_a += 1,
-            FieldOwner::PlayerB => self.player_b += 1,
+    pub fn update(&mut self, current_player: CurrentPlayer) {
+        match current_player {
+            CurrentPlayer::PlayerA => self.player_a += 1,
+            CurrentPlayer::PlayerB => self.player_b += 1,
         }
 
         self.has_updated = true;
