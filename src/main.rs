@@ -4,8 +4,10 @@ mod boxes;
 mod common;
 mod dots;
 mod sticks;
+mod score;
 
 use crate::boxes::{BoxMarker, spawn_boxes};
+use crate::score::{spawn_score, update_score_display};
 use crate::common::GridPosition;
 use crate::dots::spawn_corners;
 use crate::sticks::{StickOrientation, StickSelectEvent, spawn_edges};
@@ -27,10 +29,12 @@ fn main() {
         .add_event::<TestEvent>()
         .add_plugins((DefaultPlugins, MeshPickingPlugin))
         .add_observer(stick_selection_observer)
+        .add_systems(Startup, spawn_score)
         .add_systems(Startup, (setup, move_camera).chain())
         .add_systems(Startup, spawn_boxes)
         .add_systems(Startup, spawn_corners)
         .add_systems(Startup, spawn_edges)
+        .add_systems(Update, update_score_display)
         .run();
 }
 
@@ -61,3 +65,4 @@ fn stick_selection_observer(
         }
     }
 }
+

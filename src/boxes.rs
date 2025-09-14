@@ -1,11 +1,10 @@
 use bevy::{
-    color::palettes::tailwind::{CYAN_200, GRAY_200, RED_200},
+    color::palettes::tailwind::{BLUE_200, GRAY_200, RED_200},
     prelude::*,
 };
 
 use crate::{
-    TestEvent,
-    common::{FieldOwner, GridPosition},
+    common::{FieldOwner, GridPosition}, score::Score, TestEvent
 };
 
 #[derive(Component, Clone, Copy)]
@@ -51,15 +50,17 @@ fn update_material(
         &mut MeshMaterial2d<ColorMaterial>,
         &mut NumSelectedNeighbors,
     )>,
+    Single<&mut Score>,
 ) {
-    move |trigger, mut query| {
+    move |trigger, mut box_query, mut score| {
         let (mut owner, mut material, mut num_selected_neighbors) =
-            query.get_mut(trigger.target()).unwrap();
+            box_query.get_mut(trigger.target()).unwrap();
         num_selected_neighbors.0 += 1;
 
         if num_selected_neighbors.0 == 4 {
             *owner = FieldOwner::PlayerA;
             material.0 = box_material_set.player_a.clone();
+            score.update(FieldOwner::PlayerA);
         }
     }
 }
@@ -72,8 +73,8 @@ pub fn spawn_boxes(
     let shape = meshes.add(Rectangle::new(90.0, 90.0));
     let box_material_set = BoxMaterialSet {
         unselected: materials.add(Color::from(GRAY_200)),
-        player_a: materials.add(Color::from(CYAN_200)),
-        player_b: materials.add(Color::from(RED_200)),
+        player_a: materials.add(Color::from(RED_200)),
+        player_b: materials.add(Color::from(BLUE_200)),
     };
 
     let mut r#box = Box {
