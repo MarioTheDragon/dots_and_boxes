@@ -127,16 +127,18 @@ fn on_click(
         if let Ok((mut material, mut selected, position, orientation)) =
             sticks.get_mut(trigger.target())
         {
-            selected.0 = true;
-            material.0 = match *current_player {
-                CurrentPlayer::PlayerA => stick_material_set.selected_a.clone(),
-                CurrentPlayer::PlayerB => stick_material_set.selected_b.clone(),
-            };
+            if !selected.0 {
+                selected.0 = true;
+                material.0 = match *current_player {
+                    CurrentPlayer::PlayerA => stick_material_set.selected_a.clone(),
+                    CurrentPlayer::PlayerB => stick_material_set.selected_b.clone(),
+                };
 
-            commands.trigger(StickSelectEvent {
-                position: *position,
-                orientation: *orientation,
-            });
+                commands.trigger(StickSelectEvent {
+                    position: *position,
+                    orientation: *orientation,
+                });
+            }
         }
     }
 }
