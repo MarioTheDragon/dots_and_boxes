@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use bevy::{
-    color::palettes::tailwind::{GRAY_50, RED_200},
+    color::palettes::tailwind::{BLUE_200, GRAY_50, RED_200},
     prelude::*,
 };
 
@@ -10,6 +10,9 @@ pub enum CurrentPlayer {
     PlayerA,
     PlayerB,
 }
+
+#[derive(Component, Clone, Copy)]
+pub struct PlayerDisplayMarker;
 
 impl Display for CurrentPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -35,6 +38,10 @@ pub fn update_player_display(
 ) {
     let (entity, ref mut player) = *player_display;
     *writer.text(entity, 2) = player.to_string();
+    *writer.color(entity, 2) = match **player {
+        CurrentPlayer::PlayerA => TextColor(RED_200.into()),
+        CurrentPlayer::PlayerB => TextColor(BLUE_200.into()),
+    };
 }
 
 pub fn spawn_current_player(mut commands: Commands) {
@@ -54,6 +61,10 @@ pub fn spawn_current_player(mut commands: Commands) {
                 TextSpan::new("Current player: "),
                 TextColor(GRAY_50.into()),
             ));
-            parent.spawn((TextSpan::default(), TextColor(RED_200.into())));
+            parent.spawn((
+                TextSpan::default(),
+                TextColor(RED_200.into()),
+                PlayerDisplayMarker,
+            ));
         });
 }
