@@ -111,7 +111,7 @@ pub fn spawn_edges(
 }
 
 fn on_click(
-    stick_material_set: StickMaterialSet
+    stick_material_set: StickMaterialSet,
 ) -> impl Fn(
     Trigger<Pointer<Click>>,
     Commands,
@@ -130,8 +130,12 @@ fn on_click(
             if !selected.0 {
                 selected.0 = true;
                 material.0 = match *current_player {
-                    CurrentPlayer::PlayerA => stick_material_set.selected_a.clone(),
-                    CurrentPlayer::PlayerB => stick_material_set.selected_b.clone(),
+                    CurrentPlayer::PlayerA => {
+                        stick_material_set.selected_a.clone()
+                    }
+                    CurrentPlayer::PlayerB => {
+                        stick_material_set.selected_b.clone()
+                    }
                 };
 
                 commands.trigger(StickSelectEvent {
@@ -182,4 +186,3 @@ fn on_out(
         }
     }
 }
-

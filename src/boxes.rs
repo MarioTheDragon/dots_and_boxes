@@ -33,9 +33,7 @@ pub struct BoxMaterialSet {
 }
 
 impl BoxMaterialSet {
-    pub fn new(
-        mut materials: ResMut<Assets<ColorMaterial>>,
-    ) -> Self {
+    pub fn new(mut materials: ResMut<Assets<ColorMaterial>>) -> Self {
         Self {
             unselected: materials.add(Color::from(GRAY_200)),
             player_a: materials.add(Color::from(RED_200)),
@@ -62,7 +60,7 @@ pub fn stick_selection_observer(
     )>,
     mut score: Single<&mut Score>,
     mut current_player: Single<&mut CurrentPlayer>,
-    materials: ResMut<Assets<ColorMaterial>>
+    materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let box_material_set = BoxMaterialSet::new(materials);
     let event = trigger.event();
@@ -106,7 +104,7 @@ pub fn stick_selection_observer(
 pub fn spawn_boxes(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    materials: ResMut<Assets<ColorMaterial>>
+    materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let box_material_set = BoxMaterialSet::new(materials);
     let shape = meshes.add(Rectangle::new(90.0, 90.0));

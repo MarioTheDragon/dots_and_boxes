@@ -2,16 +2,16 @@
 
 mod boxes;
 mod common;
-mod dots;
-mod sticks;
-mod score;
 mod current_player;
+mod dots;
+mod score;
+mod sticks;
 
-use crate::boxes::{spawn_boxes, stick_selection_observer, BoxUpdateEvent};
+use crate::boxes::{BoxUpdateEvent, spawn_boxes, stick_selection_observer};
 use crate::current_player::{spawn_current_player, update_player_display};
-use crate::score::{spawn_score, update_score_display};
 use crate::dots::spawn_corners;
-use crate::sticks::{spawn_edges};
+use crate::score::{spawn_score, update_score_display};
+use crate::sticks::spawn_edges;
 use bevy::prelude::*;
 
 fn move_camera(mut camera: Single<&mut Transform, With<Camera2d>>) {
@@ -23,7 +23,6 @@ fn setup(mut commands: Commands) {
 }
 
 fn main() {
-    
     App::new()
         .add_event::<BoxUpdateEvent>()
         .add_plugins((DefaultPlugins, MeshPickingPlugin))
@@ -38,4 +37,3 @@ fn main() {
         .add_systems(Update, update_player_display)
         .run();
 }
-

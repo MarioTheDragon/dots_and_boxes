@@ -1,6 +1,9 @@
 use std::fmt::Display;
 
-use bevy::{color::palettes::tailwind::{GRAY_50, RED_200}, prelude::*};
+use bevy::{
+    color::palettes::tailwind::{GRAY_50, RED_200},
+    prelude::*,
+};
 
 #[derive(Component, Clone, Copy)]
 pub enum CurrentPlayer {
@@ -12,7 +15,7 @@ impl Display for CurrentPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CurrentPlayer::PlayerA => write!(f, "A"),
-            CurrentPlayer::PlayerB => write!(f, "B"),        
+            CurrentPlayer::PlayerB => write!(f, "B"),
         }
     }
 }
