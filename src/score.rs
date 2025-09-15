@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use crate::common::{CurrentPlayer};
+use crate::current_player::CurrentPlayer;
 
 #[derive(Component, Clone, Copy)]
 pub struct Score {
