@@ -1,15 +1,13 @@
-use bevy::asset::{Assets, Handle};
-use bevy::color::Color;
-use bevy::color::palettes::tailwind::{CYAN_300, RED_300};
-use bevy::ecs::component::Component;
-use bevy::ecs::event::Event;
+use bevy::color::palettes::tailwind::{CYAN_300, CYAN_400, RED_300, RED_400};
 use bevy::math::Quat;
+use bevy::prelude::*;
 use bevy::prelude::{
     Bundle, Click, ColorMaterial, Commands, Mesh, Mesh2d, MeshMaterial2d, Out,
     Over, Pointer, Query, Rectangle, ResMut, Transform, Trigger,
 };
 
 use crate::common::GridPosition;
+use crate::current_player::CurrentPlayer;
 
 #[derive(Component, Clone, Copy, Debug)]
 pub enum StickOrientation {
@@ -36,10 +34,13 @@ pub struct Stick {
     transform: Transform,
 }
 
+#[derive(Clone)]
 struct StickMaterialSet {
     default: Handle<ColorMaterial>,
-    hover: Handle<ColorMaterial>,
-    selected: Handle<ColorMaterial>,
+    hover_a: Handle<ColorMaterial>,
+    hover_b: Handle<ColorMaterial>,
+    selected_a: Handle<ColorMaterial>,
+    selected_b: Handle<ColorMaterial>,
 }
 
 fn spawn_edge(
@@ -49,13 +50,9 @@ fn spawn_edge(
 ) {
     commands
         .spawn(stick.clone())
-        .observe(update_material_on::<Pointer<Over>>(
-            stick_material_set.hover.clone(),
-        ))
-        .observe(update_material_on::<Pointer<Out>>(
-            stick_material_set.default.clone(),
-        ))
-        .observe(on_click(stick_material_set.selected.clone()));
+        .observe(on_hover(stick_material_set.clone()))
+        .observe(on_out(stick_material_set.default.clone()))
+        .observe(on_click(stick_material_set.clone()));
 }
 
 pub fn spawn_edges(
@@ -68,8 +65,10 @@ pub fn spawn_edges(
 
     let stick_material_set = StickMaterialSet {
         default: materials.add(color),
-        hover: materials.add(Color::from(CYAN_300)),
-        selected: materials.add(Color::from(RED_300)),
+        hover_a: materials.add(Color::from(RED_300)),
+        hover_b: materials.add(Color::from(CYAN_300)),
+        selected_a: materials.add(Color::from(RED_400)),
+        selected_b: materials.add(Color::from(CYAN_400)),
     };
 
     let mut stick = Stick {
@@ -112,7 +111,7 @@ pub fn spawn_edges(
 }
 
 fn on_click(
-    new_material: Handle<ColorMaterial>,
+    stick_material_set: StickMaterialSet
 ) -> impl Fn(
     Trigger<Pointer<Click>>,
     Commands,
@@ -122,13 +121,18 @@ fn on_click(
         &GridPosition,
         &StickOrientation,
     )>,
+    Single<&CurrentPlayer>,
 ) {
-    move |trigger, mut commands, mut sticks| {
+    move |trigger, mut commands, mut sticks, current_player| {
         if let Ok((mut material, mut selected, position, orientation)) =
             sticks.get_mut(trigger.target())
         {
             selected.0 = true;
-            material.0 = new_material.clone();
+            material.0 = match *current_player {
+                CurrentPlayer::PlayerA => stick_material_set.selected_a.clone(),
+                CurrentPlayer::PlayerB => stick_material_set.selected_b.clone(),
+            };
+
             commands.trigger(StickSelectEvent {
                 position: *position,
                 orientation: *orientation,
@@ -137,17 +141,43 @@ fn on_click(
     }
 }
 
-fn update_material_on<E>(
-    new_material: Handle<ColorMaterial>,
-) -> impl Fn(Trigger<E>, Query<(&StickSelected, &mut MeshMaterial2d<ColorMaterial>)>)
-{
-    move |trigger, mut sticks| {
+fn on_hover(
+    stick_material_set: StickMaterialSet,
+) -> impl Fn(
+    Trigger<Pointer<Over>>,
+    Query<(&StickSelected, &mut MeshMaterial2d<ColorMaterial>)>,
+    Single<&CurrentPlayer>,
+) {
+    move |trigger, mut sticks, current_player| {
         if let Ok(stick) = sticks.get_mut(trigger.target()) {
             let (already_selected, mut material) = stick;
             if already_selected.0 {
                 return;
             }
-            material.0 = new_material.clone();
+
+            material.0 = match *current_player {
+                CurrentPlayer::PlayerA => stick_material_set.hover_a.clone(),
+                CurrentPlayer::PlayerB => stick_material_set.hover_b.clone(),
+            };
         }
     }
 }
+
+fn on_out(
+    default_material: Handle<ColorMaterial>,
+) -> impl Fn(
+    Trigger<Pointer<Out>>,
+    Query<(&StickSelected, &mut MeshMaterial2d<ColorMaterial>)>,
+) {
+    move |trigger, mut sticks| {
+        if let Ok(stick) = sticks.get_mut(trigger.target()) {
+            let (already_selected, mut stick_material) = stick;
+            if already_selected.0 {
+                return;
+            }
+
+            stick_material.0 = default_material.clone();
+        }
+    }
+}
+
