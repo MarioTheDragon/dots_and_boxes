@@ -1,4 +1,6 @@
-use bevy::color::palettes::tailwind::{CYAN_300, CYAN_400, RED_300, RED_400};
+use bevy::color::palettes::tailwind::{
+    CYAN_300, CYAN_400, GRAY_300, RED_300, RED_400
+};
 use bevy::math::Quat;
 use bevy::prelude::*;
 use bevy::prelude::{
@@ -60,11 +62,10 @@ pub fn spawn_edges(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let color = Color::hsl(100.0, 0.5, 0.5);
     let shape = meshes.add(Rectangle::new(10.0, 90.0));
 
     let stick_material_set = StickMaterialSet {
-        default: materials.add(color),
+        default: materials.add(Color::from(GRAY_300)),
         hover_a: materials.add(Color::from(RED_300)),
         hover_b: materials.add(Color::from(CYAN_300)),
         selected_a: materials.add(Color::from(RED_400)),
@@ -124,25 +125,20 @@ fn on_click(
     Single<&CurrentPlayer>,
 ) {
     move |trigger, mut commands, mut sticks, current_player| {
-        if let Ok((mut material, mut selected, position, orientation)) =
-            sticks.get_mut(trigger.target())
-        {
-            if !selected.0 {
-                selected.0 = true;
-                material.0 = match *current_player {
-                    CurrentPlayer::PlayerA => {
-                        stick_material_set.selected_a.clone()
-                    }
-                    CurrentPlayer::PlayerB => {
-                        stick_material_set.selected_b.clone()
-                    }
-                };
+        let (mut material, mut selected, position, orientation) =
+            sticks.get_mut(trigger.target()).unwrap();
 
-                commands.trigger(StickSelectEvent {
-                    position: *position,
-                    orientation: *orientation,
-                });
-            }
+        if !selected.0 {
+            selected.0 = true;
+            material.0 = match *current_player {
+                CurrentPlayer::PlayerA => stick_material_set.selected_a.clone(),
+                CurrentPlayer::PlayerB => stick_material_set.selected_b.clone(),
+            };
+
+            commands.trigger(StickSelectEvent {
+                position: *position,
+                orientation: *orientation,
+            });
         }
     }
 }
