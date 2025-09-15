@@ -1,5 +1,5 @@
 use bevy::color::palettes::tailwind::{
-    CYAN_300, CYAN_400, GRAY_300, RED_300, RED_400
+    CYAN_300, CYAN_400, GRAY_300, RED_300, RED_400,
 };
 use bevy::math::Quat;
 use bevy::prelude::*;

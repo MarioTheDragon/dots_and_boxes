@@ -1,6 +1,6 @@
 use bevy::asset::Assets;
 use bevy::color::Color;
-use bevy::color::palettes::tailwind::GRAY_800;
+use bevy::color::palettes::tailwind::GRAY_100;
 use bevy::prelude::{
     Bundle, ColorMaterial, Commands, Mesh, Mesh2d, MeshMaterial2d, Rectangle,
     ResMut, Transform,
@@ -18,7 +18,7 @@ pub fn spawn_corners(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let color = materials.add(Color::from(GRAY_800));
+    let color = materials.add(Color::from(GRAY_100));
     let shape = meshes.add(Rectangle::new(10.0, 10.0));
 
     let mut corner = Dot {
