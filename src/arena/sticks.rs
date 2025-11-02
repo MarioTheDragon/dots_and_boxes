@@ -58,9 +58,9 @@ fn spawn_edge(
 }
 
 pub fn spawn_edges(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
 ) {
     let shape = meshes.add(Rectangle::new(10.0, 90.0));
 
@@ -83,7 +83,7 @@ pub fn spawn_edges(
 
     for _ in 0..10 {
         for _ in 0..4 {
-            spawn_edge(&mut commands, stick.clone(), &stick_material_set);
+            spawn_edge(commands, stick.clone(), &stick_material_set);
             stick.transform.translation.y += 100.0;
             stick.grid_position.y += 2;
         }
@@ -100,7 +100,7 @@ pub fn spawn_edges(
         Quat::from_rotation_z(std::f32::consts::PI / 2.0);
     for _ in 0..9 {
         for _ in 0..5 {
-            spawn_edge(&mut commands, stick.clone(), &stick_material_set);
+            spawn_edge(commands, stick.clone(), &stick_material_set);
             stick.transform.translation.y += 100.0;
             stick.grid_position.y += 2;
         }

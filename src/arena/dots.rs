@@ -14,9 +14,9 @@ pub struct Dot {
 }
 
 pub fn spawn_corners(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
 ) {
     let color = materials.add(Color::from(GRAY_100));
     let shape = meshes.add(Rectangle::new(10.0, 10.0));

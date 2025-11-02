@@ -7,7 +7,7 @@ use crate::{
     common::GridPosition,
     current_player::CurrentPlayer,
     score::Score,
-    sticks::{StickOrientation, StickSelectEvent},
+    arena::sticks::{StickOrientation, StickSelectEvent},
 };
 
 #[derive(Event)]
@@ -33,7 +33,7 @@ pub struct BoxMaterialSet {
 }
 
 impl BoxMaterialSet {
-    pub fn new(mut materials: ResMut<Assets<ColorMaterial>>) -> Self {
+    pub fn new(materials: &mut ResMut<Assets<ColorMaterial>>) -> Self {
         Self {
             unselected: materials.add(Color::from(GRAY_700)),
             player_a: materials.add(Color::from(RED_200)),
@@ -60,9 +60,9 @@ pub fn stick_selection_observer(
     )>,
     mut score: Single<&mut Score>,
     mut current_player: Single<&mut CurrentPlayer>,
-    materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let box_material_set = BoxMaterialSet::new(materials);
+    let box_material_set = BoxMaterialSet::new(&mut materials);
     let event = trigger.event();
     let mut should_player_switch = true;
 
@@ -102,9 +102,9 @@ pub fn stick_selection_observer(
 }
 
 pub fn spawn_boxes(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    materials: ResMut<Assets<ColorMaterial>>,
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
 ) {
     let box_material_set = BoxMaterialSet::new(materials);
     let shape = meshes.add(Rectangle::new(90.0, 90.0));
