@@ -8,7 +8,8 @@ use bevy::prelude::{
     Over, Pointer, Query, Rectangle, ResMut, Transform, Trigger,
 };
 
-use crate::common::GridPosition;
+use crate::arena::dimensions::Dimensions;
+use crate::grid_position::GridPosition;
 use crate::current_player::CurrentPlayer;
 
 #[derive(Component, Clone, Copy, Debug)]
@@ -61,6 +62,7 @@ pub fn spawn_edges(
     commands: &mut Commands,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<ColorMaterial>>,
+    dimensions: Dimensions,
 ) {
     let shape = meshes.add(Rectangle::new(10.0, 90.0));
 
@@ -81,8 +83,9 @@ pub fn spawn_edges(
         selected: StickSelected(false),
     };
 
-    for _ in 0..10 {
-        for _ in 0..4 {
+    let vertical_stick_dimensions = dimensions.for_sticks_vertical();
+    for _ in 0..vertical_stick_dimensions.x {
+        for _ in 0..vertical_stick_dimensions.y {
             spawn_edge(commands, stick.clone(), &stick_material_set);
             stick.transform.translation.y += 100.0;
             stick.grid_position.y += 2;
@@ -98,8 +101,10 @@ pub fn spawn_edges(
     stick.orientation = StickOrientation::Horizontal;
     stick.transform.rotation =
         Quat::from_rotation_z(std::f32::consts::PI / 2.0);
-    for _ in 0..9 {
-        for _ in 0..5 {
+
+    let horizontal_stick_dimensions = dimensions.for_sticks_horizontal();
+    for _ in 0..horizontal_stick_dimensions.x {
+        for _ in 0..horizontal_stick_dimensions.y {
             spawn_edge(commands, stick.clone(), &stick_material_set);
             stick.transform.translation.y += 100.0;
             stick.grid_position.y += 2;

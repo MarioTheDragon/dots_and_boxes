@@ -1,6 +1,6 @@
 #![allow(clippy::type_complexity)]
 
-mod common;
+mod grid_position;
 mod current_player;
 mod score;
 mod arena;

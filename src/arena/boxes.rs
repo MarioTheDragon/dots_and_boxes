@@ -4,10 +4,7 @@ use bevy::{
 };
 
 use crate::{
-    common::GridPosition,
-    current_player::CurrentPlayer,
-    score::Score,
-    arena::sticks::{StickOrientation, StickSelectEvent},
+    arena::{dimensions::{Dimensions}, sticks::{StickOrientation, StickSelectEvent}}, current_player::CurrentPlayer, grid_position::GridPosition, score::Score
 };
 
 #[derive(Event)]
@@ -105,6 +102,7 @@ pub fn spawn_boxes(
     commands: &mut Commands,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<ColorMaterial>>,
+    dimensions: Dimensions,
 ) {
     let box_material_set = BoxMaterialSet::new(materials);
     let shape = meshes.add(Rectangle::new(90.0, 90.0));
@@ -117,8 +115,9 @@ pub fn spawn_boxes(
         num_selected_neighbors: NumSelectedNeighbors(0),
     };
 
-    for _ in 0..9 {
-        for _ in 0..4 {
+    let box_dimensions = dimensions.for_boxes();
+    for _ in 0..box_dimensions.x {
+        for _ in 0..box_dimensions.y {
             commands.spawn(r#box.clone());
             r#box.transform.translation.y += 100.0;
             r#box.grid_position.y += 2;
