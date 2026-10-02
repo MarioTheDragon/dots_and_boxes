@@ -1,6 +1,4 @@
-use bevy::color::palettes::tailwind::{
-    CYAN_300, CYAN_400, GRAY_300, RED_300, RED_400,
-};
+use bevy::color::palettes::tailwind::{CYAN_300, CYAN_400, RED_300, RED_400};
 use bevy::math::Quat;
 use bevy::prelude::*;
 use bevy::prelude::{
@@ -9,8 +7,8 @@ use bevy::prelude::{
 };
 
 use crate::arena::dimensions::Dimensions;
-use crate::grid_position::GridPosition;
 use crate::current_player::CurrentPlayer;
+use crate::grid_position::GridPosition;
 
 #[derive(Component, Clone, Copy, Debug)]
 pub enum StickOrientation {
@@ -67,7 +65,7 @@ pub fn spawn_edges(
     let shape = meshes.add(Rectangle::new(10.0, 90.0));
 
     let stick_material_set = StickMaterialSet {
-        default: materials.add(Color::from(GRAY_300)),
+        default: materials.add(Color::srgb_u8(43, 44, 47)),
         hover_a: materials.add(Color::from(RED_300)),
         hover_b: materials.add(Color::from(CYAN_300)),
         selected_a: materials.add(Color::from(RED_400)),

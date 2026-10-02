@@ -1,5 +1,5 @@
 use bevy::{
-    color::palettes::tailwind::{BLUE_200, GRAY_700, RED_200},
+    color::palettes::tailwind::{BLUE_200, RED_200},
     prelude::*,
 };
 
@@ -38,7 +38,7 @@ pub struct BoxMaterialSet {
 impl BoxMaterialSet {
     pub fn new(materials: &mut ResMut<Assets<ColorMaterial>>) -> Self {
         Self {
-            unselected: materials.add(Color::from(GRAY_700)),
+            unselected: materials.add(Color::srgb_u8(43, 44, 47)),
             player_a: materials.add(Color::from(RED_200)),
             player_b: materials.add(Color::from(BLUE_200)),
         }
