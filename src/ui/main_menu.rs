@@ -78,7 +78,7 @@ pub fn button_system(
         (&Interaction, &mut BackgroundColor),
         Changed<Interaction>,
     >,
-    main_menu_query: Query<Entity, With<MainMenuRoot>>,
+    main_menu_query: Single<Entity, With<MainMenuRoot>>,
     mouse: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -95,8 +95,7 @@ pub fn button_system(
             }
             Interaction::Hovered => {
                 if mouse.just_released(MouseButton::Left) {
-                    let main_menu = main_menu_query.single().unwrap();
-                    commands.entity(main_menu).despawn();
+                    commands.entity(main_menu_query.entity()).despawn();
 
                     spawn_score(&mut commands);
                     spawn_current_player(&mut commands);
