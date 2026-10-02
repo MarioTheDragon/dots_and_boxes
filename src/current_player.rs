@@ -44,7 +44,7 @@ pub fn update_player_display(
     };
 }
 
-pub fn spawn_current_player(mut commands: Commands) {
+pub fn spawn_current_player(commands: &mut Commands) {
     commands
         .spawn((
             Text::default(),

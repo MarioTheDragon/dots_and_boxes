@@ -4,7 +4,13 @@ use bevy::{
 };
 
 use crate::{
-    arena::{dimensions::{Dimensions}, sticks::{StickOrientation, StickSelectEvent}}, current_player::CurrentPlayer, grid_position::GridPosition, score::Score
+    arena::{
+        dimensions::Dimensions,
+        sticks::{StickOrientation, StickSelectEvent},
+    },
+    current_player::CurrentPlayer,
+    grid_position::GridPosition,
+    score::Score,
 };
 
 #[derive(Event)]

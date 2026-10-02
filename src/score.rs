@@ -43,7 +43,7 @@ pub fn update_score_display(
     }
 }
 
-pub fn spawn_score(mut commands: Commands) {
+pub fn spawn_score(commands: &mut Commands) {
     commands
         .spawn((
             Text::default(),
