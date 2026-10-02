@@ -3,9 +3,19 @@ use bevy::{
     prelude::*,
 };
 
+use crate::{
+    arena::spawn_arena, current_player::spawn_current_player,
+    score::spawn_score,
+};
+
+/// This struct must only be used once: for the root of the main menu.
+#[derive(Component)]
+pub struct MainMenuRoot;
+
 pub fn spawn_start_menu(mut commands: Commands) {
     commands.spawn((
         Text::default(),
+        MainMenuRoot,
         Node {
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
@@ -61,4 +71,43 @@ fn start_button() -> (
         BackgroundColor(GRAY_800.into()),
         children![(Text::new("Start Game"), TextColor(BLUE_200.into()),)],
     )
+}
+
+pub fn button_system(
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor),
+        Changed<Interaction>,
+    >,
+    main_menu_query: Query<Entity, With<MainMenuRoot>>,
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
+    const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
+    const PRESSED_BUTTON: Color = Color::srgb(0.35, 0.35, 0.35);
+
+    for (interaction, mut color) in &mut interaction_query {
+        match *interaction {
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
+            }
+            Interaction::Hovered => {
+                if mouse.just_released(MouseButton::Left) {
+                    let main_menu = main_menu_query.single().unwrap();
+                    commands.entity(main_menu).despawn();
+
+                    spawn_score(&mut commands);
+                    spawn_current_player(&mut commands);
+                    spawn_arena(&mut commands, &mut meshes, &mut materials);
+                } else {
+                    *color = HOVERED_BUTTON.into();
+                }
+            }
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+            }
+        }
+    }
 }

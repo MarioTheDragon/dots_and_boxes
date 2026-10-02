@@ -11,13 +11,13 @@ pub mod dots;
 pub mod sticks;
 
 pub fn spawn_arena(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
 ) {
     let dimensions = Dimensions::from(10, 5);
 
-    spawn_boxes(&mut commands, &mut meshes, &mut materials, dimensions);
-    spawn_edges(&mut commands, &mut meshes, &mut materials, dimensions);
-    spawn_corners(&mut commands, &mut meshes, &mut materials, dimensions);
+    spawn_boxes(commands, meshes, materials, dimensions);
+    spawn_edges(commands, meshes, materials, dimensions);
+    spawn_corners(commands, meshes, materials, dimensions);
 }
